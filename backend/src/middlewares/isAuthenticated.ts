@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-
 declare global {
     namespace Express{
         interface Request {
@@ -9,7 +8,7 @@ declare global {
     }
 }
 
-export const isAuthenticated = async (req: Request, res: Response, next: NextFunction) => {
+export const isAuthenticated = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const token = req.cookies.token;
         if (!token) {
@@ -31,7 +30,8 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
         next();
     } catch (error) {
         return res.status(500).json({
-            message: "Internal server error"
+            message: "User not authenticated"
         })
     }
+
 }

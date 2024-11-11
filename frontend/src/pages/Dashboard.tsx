@@ -1,22 +1,37 @@
 import { Separator } from "@/components/ui/separator";
 import { useUserStore } from "@/store/useUserStore";
 import { Link } from "react-router-dom";
+import SideBar from "@/components/SideBar";
+import Applications from "./Applications";
+import Users from "./Users";
+// const Dashboard = ({ children }: { children: React.ReactNode }) => {
 const Dashboard = () => {
-    const {user,isAuthenticated, admin}=useUserStore()
 
-  return (
+    const {user,isAuthenticated, role}=useUserStore()
+
+    return (
     <> 
     {isAuthenticated?(
+        <>
         <section className='heading'>
-    {admin?(
-        <h2>Welcome to youX Admin Dashboard</h2>
-    ):(
-        <h2>Welcome to youX User Dashboard</h2>
+        <h2 >Welcome to youX <span className="font-bold">{role}</span> Dashboard</h2> 
+    {role.toLowerCase()==="admin"?(
+        <>
+        <Users />
+        <Applications />
+        </>
+        ):(
+        <>
+        <Applications />
+        </>
+        
     )}
+     
     </section>
+  
+    </>
     ):(
         <>
-        <Separator/>
         <p className="mt-2">
             Not an authorized user, please {" "}
             <Link to="/login" className="text-blue-500">Login </Link>

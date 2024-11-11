@@ -5,7 +5,7 @@ export interface IUser {
     email:string;
     phone:number;
     password:string;
-    admin:boolean;
+    role:string;
 }
 
 const userSchema = new mongoose.Schema<IUser>({
@@ -27,7 +27,7 @@ const userSchema = new mongoose.Schema<IUser>({
         required: [true, "Please add a password."]
     },
  
-    admin:{type:Boolean, default:false},
+    role:{type:String, default:"User"},
 
 },{timestamps:true});
 

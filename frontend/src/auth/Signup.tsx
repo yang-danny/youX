@@ -13,6 +13,7 @@ const Signup = () => {
         email:"",
         password:"", 
         phone:"", 
+        role:"User"
     });
     const [errors, setErrors] = useState<Partial<SignupInputState>>({});
     const {signup, loading } = useUserStore();

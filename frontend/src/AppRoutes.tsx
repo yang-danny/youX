@@ -4,6 +4,9 @@ import HomePage from './pages/HomePage';
 import Login from './auth/Login';
 import Signup from './auth/Signup';
 import Dashboard from './pages/Dashboard';
+import CreateApplication from './components/Applications/CreateApplication';
+import ApplicationDetails from './components/Applications/ApplicationDetails';
+import UserDetails from './components/Users/UserDetails';
 const AppRoutes=()=>{
     return(
         <Routes>
@@ -12,7 +15,9 @@ const AppRoutes=()=>{
             <Route path="user" element={<span>User Page</span>}/>
             <Route path="login" element={<Login />}/>
             <Route path="signup" element={<Signup />}/>
-            
+            <Route path="application/create" element={<Layout ><CreateApplication /></Layout>}/>
+            <Route path="application/:id" element={<Layout ><ApplicationDetails /></Layout>}/>
+            <Route path="user/:id" element={<Layout ><UserDetails /></Layout>} />
             <Route path="*" element={<Navigate to="/"/>} />
         </Routes>
     )
