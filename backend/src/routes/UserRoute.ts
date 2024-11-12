@@ -1,11 +1,9 @@
-
 import express from "express";
 import userController  from "../controller/UserController";
-import { isAuthenticated } from "../middlewares/isAuthenticated";
-import {protect} from "../middlewares/authMmiddleware";
+import {protect} from "../middlewares/authMiddleware";
+
 const router = express.Router();
 
-// router.post("/register", userController.signup);
 router.post("/signup", userController.signup);
 router.post("/login", userController.login);
 router.get("/users", protect, userController.getUsers);

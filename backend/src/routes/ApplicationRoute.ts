@@ -1,7 +1,6 @@
 import express from "express";
 import applicationController from "../controller/ApplicationController";
-import {isAuthenticated} from "../middlewares/isAuthenticated";
-import {protect} from "../middlewares/authMmiddleware";
+import {protect} from "../middlewares/authMiddleware";
 
 const router = express.Router();
 

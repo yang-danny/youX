@@ -2,7 +2,8 @@ import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import {User} from "../models/UserModel"
 import asyncHandler from 'express-async-handler'
-4
+import logger from "../logger";
+
 interface JwtPayload {
     _id: string;
 }
@@ -33,6 +34,7 @@ export const protect = asyncHandler(async (req: Request, res: Response, next: Ne
         next()
       } catch (error) {
         console.log(error)
+        logger.error("User not authenticated");
         return res.status(500).json({
             message: "User not authenticated"
         })
@@ -40,11 +42,10 @@ export const protect = asyncHandler(async (req: Request, res: Response, next: Ne
     }
   
     if (!token) {
+      logger.error("Can not found a user token");
         return res.status(401).json({
             success: false,
-            message: "User not authenticated"
+            message: "Can not found a user token"
         });
-    //   res.status(401)
-    //   throw new Error('Not authorized, no token')
     }
 })
