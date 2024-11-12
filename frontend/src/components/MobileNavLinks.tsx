@@ -3,17 +3,17 @@ import { Button } from "./ui/button";
 import { useUserStore } from "@/store/useUserStore";
 
 const MobileNavLinks = () => {
-  const { logout } = useUserStore();
+  const { id, logout } = useUserStore();
   return (
     <>
       <Link
-        to="/manage-restaurant"
+        to="/dashboard"
         className="flex bg-white items-center font-bold text-black hover:text-orange-500"
       >
-        My Applications
+        Dashboard
       </Link>
       <Link
-        to="/user-profile"
+        to={`/user/${id}`} 
         className="flex bg-white items-center font-bold text-black hover:text-orange-500"
       >
         User Profile

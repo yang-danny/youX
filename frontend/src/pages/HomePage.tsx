@@ -1,6 +1,4 @@
 import youx1 from "../assets/yp1.jpg"
-import youx2 from "../assets/yp2.png"
-
 const HomePage = () => {
   return (
     <div className="flex flex-col gap-12">

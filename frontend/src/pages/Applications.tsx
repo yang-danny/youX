@@ -1,7 +1,5 @@
-import ApplicationForm from '@/components/Applications/ApplicationForm'
+
 import ApplicationsList from '@/components/Applications/ApplicationsList'
-import CreateApplication from '@/components/Applications/CreateApplication'
-import React from 'react'
 
 const Applications = () => {
   return (

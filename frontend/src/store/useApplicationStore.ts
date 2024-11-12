@@ -25,25 +25,26 @@ type Application = {
 type ApplicationState = {
     application: Application[];
     loading: boolean;
-    create: (input:ApplicationCreateState) => Promise<void>;
-    getApplications: () => Promise<void>;
-    getUserApplications: (id:string) => Promise<void>;
-    deleteApplication:(id:string)=> Promise<void>;
-    getApplicationDetails:(id:string)=> Promise<void>;
-    updateApplicationDetails:(id:string,input:ApplicationCreateState)=> Promise<void>;
+    create: (token:string, input:ApplicationCreateState) => Promise<void>;
+    getApplications: (token:string,) => Promise<void>;
+    getUserApplications: (id:string,token:string) => Promise<void>;
+    deleteApplication:(id:string,token:string)=> Promise<void>;
+    getApplicationDetails:(id:string,token:string)=> Promise<void>;
+    updateApplicationDetails:(id:string,token:string,input:ApplicationCreateState)=> Promise<void>;
 }
 
 export const useApplicationStore = create<ApplicationState>()(persist((set) => ({
     application: [],
     loading: false,
  
-    create: async (input: ApplicationCreateState) => {
+    create: async (token:string, input: ApplicationCreateState) => {
      
         try {
             set({ loading: true });
             const response = await axios.post(`${applicationAPI}/create`, input, {
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 }
             });
             if (response.data) {   
@@ -55,13 +56,13 @@ export const useApplicationStore = create<ApplicationState>()(persist((set) => (
             set({ loading: false });
         }
     },
-    getApplications: async () => {
-     
+    getApplications: async (token:string) => {
         try {
             set({ loading: true });
             const response = await axios.get(`${applicationAPI}`, {
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 }
             });
             if (response.data) {   
@@ -72,13 +73,14 @@ export const useApplicationStore = create<ApplicationState>()(persist((set) => (
             set({ loading: false });
         }
     },
-    getUserApplications: async (id:string) => {
+    getUserApplications: async (id:string,token:string) => {
      
         try {
             set({ loading: true });
             const response = await axios.get(`${applicationAPI}/user/${id}`, {
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 }
             });
             if (response.data) {   
@@ -89,28 +91,30 @@ export const useApplicationStore = create<ApplicationState>()(persist((set) => (
             set({ loading: false });
         }
     },
-    deleteApplication:async(id:string) => {
+    deleteApplication:async(id:string,token:string) => {
         try {
             set({ loading: true });
             const response = await axios.delete(`${applicationAPI}/${id}`, {
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                     'Authorization': `Bearer ${token}`
                 }
             });
             if (response.data) {   
-                toast.success(response.data.message);
+                toast.success("Delete application successfully...");
             }
         } catch (error:any) {
             toast.error(error.response.data.message);
             set({ loading: false });
         }
     },
-    getApplicationDetails:async(id:string) => {
+    getApplicationDetails:async(id:string,token:string) => {
         try {
             set({ loading: true });
             const response = await axios.get(`${applicationAPI}/${id}`, {
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                     'Authorization': `Bearer ${token}`
                 }
             });
             if (response.data) {   
@@ -122,12 +126,13 @@ export const useApplicationStore = create<ApplicationState>()(persist((set) => (
             set({ loading: false });
         }
     },
-    updateApplicationDetails:async(id:string,input: ApplicationCreateState) => {
+    updateApplicationDetails:async(id:string,token:string,input: ApplicationCreateState) => {
         try {
             set({ loading: true });
             const response = await axios.put(`${applicationAPI}/${id}`, input, {
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                     'Authorization': `Bearer ${token}`
                 }
             });
             if (response.data) {   

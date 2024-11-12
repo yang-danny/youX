@@ -12,9 +12,8 @@ const AppRoutes=()=>{
         <Routes>
             <Route path="/" element={<Layout ><HomePage /> </Layout>}/>
             <Route path="dashboard" element={ <Layout ><Dashboard /></Layout>}/>
-            <Route path="user" element={<span>User Page</span>}/>
-            <Route path="login" element={<Login />}/>
-            <Route path="signup" element={<Signup />}/>
+            <Route path="login" element={<Layout ><Login /></Layout>}/>
+            <Route path="signup" element={<Layout ><Signup /></Layout>}/>
             <Route path="application/create" element={<Layout ><CreateApplication /></Layout>}/>
             <Route path="application/:id" element={<Layout ><ApplicationDetails /></Layout>}/>
             <Route path="user/:id" element={<Layout ><UserDetails /></Layout>} />

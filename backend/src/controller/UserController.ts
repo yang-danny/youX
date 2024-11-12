@@ -2,54 +2,95 @@ import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
 import { Request, Response } from "express";
 import { User } from "../models/UserModel";
-
+import asyncHandler from 'express-async-handler'
 // Generate token by provided secret key
 const generateToken = (id:Object) => {
   return jwt.sign({ id }, process.env.SECRET_KEY!, {
     expiresIn: '30d',
   })
 }
-// Signup new user
-const signup = async (req: Request, res: Response) => {
-  try {
-    const {name, email, phone, password, role } = req.body;
-    // Check  user data
-    if (!name || !email || !password || !phone ) {
-      res.status(400)
-      throw new Error('Please add all fields')
-    }
-    // Check if user exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      res.status(400)
-      throw new Error('User already exists')
-    }
-    // Hash password
-    const salt = await bcrypt.genSalt(10)
-    const hashedPassword = await bcrypt.hash(password, salt)
-    // Create user
-    const newUser = new User({
-      name, 
-      email, 
-      phone, 
-      password: hashedPassword, 
-      role 
-    });
-    await newUser.save();
+const signup = asyncHandler(async (req: Request, res: Response) => {
+  const {name, email, phone, password, role } = req.body;
 
-    res.status(201).json({
-      _id: newUser.id,
-      name: newUser.name,
-      email: newUser.email,
-      phone: newUser.phone,
-      role: newUser.role,
-      token: generateToken(newUser._id),
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Error for signup user" });
+  if (!name || !email || !password || !phone || !role) {
+    res.status(400)
+    throw new Error('Please add all fields')
   }
-};
+  // Check if user exists
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    res.status(400)
+    throw new Error('User already exists')
+  }
+
+  // Hash password
+  const salt = await bcrypt.genSalt(10)
+  const hashedPassword = await bcrypt.hash(password, salt)
+
+  // Create user
+  const user = await User.create({
+    name, 
+    email, 
+    phone, 
+    password: hashedPassword, 
+    role 
+  })
+
+  if (user) {
+    res.status(201).json({
+      _id: user.id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      role: user.role,
+      token: generateToken(user._id),
+    })
+  } else {
+    res.status(400)
+    throw new Error('Invalid user data')
+  }
+})
+// Signup new user
+// const signup = async (req: Request, res: Response) => {
+//   try {
+//     const {name, email, phone, password, role } = req.body;
+//     // Check  user data
+//     if (!name || !email || !password || !phone || !role) {
+//       res.status(400)
+//       throw new Error('Please add all fields')
+//     }
+//     // Check if user exists
+//     const existingUser = await User.findOne({ email });
+//     if (existingUser) {
+//       res.status(400)
+//       throw new Error('User already exists')
+//     }
+//     // Hash password
+//     const salt = await bcrypt.genSalt(10)
+//     const hashedPassword = await bcrypt.hash(password, salt)
+//     // Create user
+//     const newUser = new User({
+//       name, 
+//       email, 
+//       phone, 
+//       password: hashedPassword, 
+//       role 
+//     });
+//     await newUser.save();
+
+//     res.status(201).json({
+//       _id: newUser.id,
+//       name: newUser.name,
+//       email: newUser.email,
+//       phone: newUser.phone,
+//       role: newUser.role,
+//       token: generateToken(newUser._id),
+//     });
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).json({ message: "Error for signup user" });
+//   }
+// };
 // User login
 const login = async (req: Request, res: Response) => {
   const { email, password } = req.body

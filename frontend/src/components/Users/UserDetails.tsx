@@ -1,5 +1,5 @@
 import { useEffect, useState, ChangeEvent, FormEvent } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import axios from "axios";
 import { Label } from '../ui/label';
 import { Button } from '../ui/button';
@@ -11,13 +11,16 @@ import {
     SelectTrigger,
     SelectValue,
   } from "@/components/ui/select";
-  import { useUserStore } from "@/store/useUserStore";
-  import {SignupInputState, userSignupSchema} from  "@/schema/userSchema"
+import { useUserStore } from "@/store/useUserStore";
+import {SignupInputState, userSignupSchema} from  "@/schema/userSchema"
 import { Input } from '../ui/input';
+import { Loader2 } from "lucide-react";
   const API=import.meta.env.BACKEND_API_URL
-const UserDetails = () => {
+
+  const UserDetails = () => {
+    // Get User ID
     const { id } = useParams();
-    const {loading,updateUserDetails}=useUserStore()
+    const {loading,isAuthenticated,updateUserDetails,token}=useUserStore()
     const [user, setUser] = useState({})
     const [edit, setEdit] = useState(false)
     const [input, setInput] = useState<SignupInputState>({
@@ -28,11 +31,13 @@ const UserDetails = () => {
         role:"",
     });
     const [errors, setErrors] = useState<Partial<SignupInputState>>({});
+    // Get user's application by ID
     const getUser=async()=>{
         try {
             const response = await axios.get(`${API}/user/${id}`, {
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                     'Authorization': `Bearer ${token}`
                 }
             });
             if (response.data) {   
@@ -42,6 +47,7 @@ const UserDetails = () => {
         console.log(error)
         }
     }
+    // Set edited values
     const setEditValues =()=>{
         setEdit(true)
         setInput({
@@ -52,35 +58,35 @@ const UserDetails = () => {
         role:user.role, 
       })
       }
-      const changeEventHandler = (e:ChangeEvent<HTMLInputElement>) => {
+    // Handle fields value change
+    const changeEventHandler = (e:ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
         setInput({...input, [name]:value});
       }
       useEffect(() => {
         getUser()
     }, [])
-  
+    // Handle form submit
     const userSubmitHandler = async (e:FormEvent) => {
         e.preventDefault();
-        // form validation check start
+        // form validation 
         const result = userSignupSchema.safeParse(input);
         if(!result.success){
             const fieldErrors = result.error.formErrors.fieldErrors;
             setErrors(fieldErrors as Partial<SignupInputState>);
             return;
         }
-        // Update api implementation start here
-        console.log('====================================');
-        console.log(input);
-        console.log('====================================');
+        // Update application API 
         try {
-          await updateUserDetails(id!,input);
+          await updateUserDetails(id!,token,input);
           window.location.reload();
         } catch (error) {
           console.log(error);
         }
     }
   return (
+    <>
+    {isAuthenticated?(
     <div className="mb-4 mt-4">
     <div className="mb-4 mt-4">
     <h1 className="font-bold text-2xl">User Details:</h1>
@@ -178,9 +184,16 @@ const UserDetails = () => {
       </div>
       <div className="mb-4 space-x-4">
           <div className=" space-x-4 flex justify-center">
-          <Button type="submit" className=" bg-black text-white hover:bg-hoverOrange">
-            Update User
-          </Button>
+            {loading?(
+            <Button disabled className=" bg-black text-white hover:bg-hoverOrange">
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait
+            </Button>
+            ):(
+            <Button type="submit" className=" bg-black text-white hover:bg-hoverOrange">
+                Update User
+            </Button>
+            )}
+
           <Button onClick={()=>setEdit(false)} className=" bg-black text-white hover:bg-hoverOrange">
             Cancel
           </Button>
@@ -226,6 +239,18 @@ const UserDetails = () => {
     )}
     </div>
     </div>
+    ):(
+        <>
+        <p className="mt-2">
+            Not an authorized user, please {" "}
+            <Link to="/login" className="text-blue-500">Login </Link>
+            OR 
+            <Link to="/signup" className="text-blue-500"> Signup</Link>
+        </p>
+        </>
+    )}
+    </>
+   
   )
 }
 

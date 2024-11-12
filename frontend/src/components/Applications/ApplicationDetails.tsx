@@ -1,5 +1,5 @@
 import { useEffect, useState, ChangeEvent, FormEvent } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import axios from "axios";
 import { Label } from '../ui/label';
 import { Button } from '../ui/button';
@@ -14,10 +14,13 @@ import {
 import {ApplicationCreateState,applicationSchema} from "@/schema/applicationSchema"
 import { Input } from '../ui/input';
 import { useApplicationStore } from "@/store/useApplicationStore";
+import { useUserStore } from "@/store/useUserStore";
+import { Loader2 } from "lucide-react";
 
 const API=import.meta.env.BACKEND_API_URL
 const ApplicationDetails = () => {
     const { id } = useParams();
+    const {token, isAuthenticated }=useUserStore()
     const {loading, updateApplicationDetails}=useApplicationStore()
     const [application, setApplication] = useState({})
     const [edit, setEdit] = useState(false)
@@ -34,11 +37,13 @@ const ApplicationDetails = () => {
       status:"pending", 
   });
     const [errors, setErrors] = useState<Partial<ApplicationCreateState>>({});
+    // Load application by ID
     const getApplication=async()=>{
         try {
             const response = await axios.get(`${API}/application/${id}`, {
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 }
             });
             if (response.data) {   
@@ -48,7 +53,7 @@ const ApplicationDetails = () => {
         console.log(error)
         }
     }
-
+    // Set edited values
     const setEditValues =()=>{
       setEdit(true)
       setInput({
@@ -64,7 +69,7 @@ const ApplicationDetails = () => {
       status:application.status, 
     })
     }
-
+    // Handle fields value change
     const changeEventHandler = (e:ChangeEvent<HTMLInputElement>) => {
       const {name, value} = e.target;
       setInput({...input, [name]:value});
@@ -73,19 +78,19 @@ const ApplicationDetails = () => {
     useEffect(() => {
         getApplication()
     }, [])
-
+    // Submit application edit
     const applicationSubmitHandler = async (e:FormEvent) => {
       e.preventDefault();
-      // form validation check start
+      // form validation
       const result = applicationSchema.safeParse(input);
       if(!result.success){
           const fieldErrors = result.error.formErrors.fieldErrors;
           setErrors(fieldErrors as Partial<ApplicationCreateState>);
           return;
       }
-      // Update api implementation start here
+      // Update application API 
       try {
-        await updateApplicationDetails(id!,input);
+        await updateApplicationDetails(id!,token,input);
         window.location.reload();
       } catch (error) {
         console.log(error);
@@ -93,11 +98,12 @@ const ApplicationDetails = () => {
   }
 
     return (
-    <div className="mb-4 mt-4">
+      <>
+      {isAuthenticated?(
       <div className="mb-4 mt-4">
-      <h1 className="font-bold text-2xl">Finance Application Details:</h1>
-      </div>
-  
+        <div className="mb-4 mt-4">
+          <h1 className="font-bold text-2xl">Finance Application Details:</h1>
+        </div>
       <form onSubmit={applicationSubmitHandler} className="md:p-8 w-full  rounded-lg border border-gray-200 my-4">
       <Label className="font-bold text-xl">Customer Details </Label>
        <div className="grid rounded-lg my-4 px-4 py-4 grid-cols-1 gap-4 md:grid-cols-4 bg-slate-200" >
@@ -306,9 +312,16 @@ const ApplicationDetails = () => {
       </div>
       <div className="mb-4 space-x-4">
           <div className=" space-x-4 flex justify-center">
-          <Button type="submit" className=" bg-black text-white hover:bg-hoverOrange">
-            Update Application
-          </Button>
+            {loading?(
+              <Button disabled className="bg-black text-white hover:bg-hoverOrange">
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait
+              </Button>
+            ):(
+              <Button type="submit" className=" bg-black text-white hover:bg-hoverOrange">
+              Update Application
+              </Button>
+            )}
+          
           <Button onClick={()=>setEdit(false)} className=" bg-black text-white hover:bg-hoverOrange">
             Cancel
           </Button>
@@ -374,7 +387,6 @@ const ApplicationDetails = () => {
 
       </div>
       </div>
-  
       <div className="mb-10 flex justify-center">
         <Button className=" bg-black text-white "
           onClick={setEditValues}>
@@ -384,7 +396,19 @@ const ApplicationDetails = () => {
       </>
       )}
       </form>
-    </div>
+      </div>
+      ):(
+      <>
+        <p className="mt-2">
+            Not an authorized user, please {" "}
+            <Link to="/login" className="text-blue-500">Login </Link>
+            OR 
+            <Link to="/signup" className="text-blue-500"> Signup</Link>
+        </p>
+        </>
+      )}
+      </>
+    
   )
 }
 

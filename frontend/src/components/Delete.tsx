@@ -20,7 +20,7 @@ interface DeleteProps {
 }
 const Delete: React.FC<DeleteProps> = ({ item, id }) => {
     const {deleteApplication}=useApplicationStore()
-    const {deleteUser}=useUserStore()
+    const {token,deleteUser}=useUserStore()
     const onDelete = async () => {
     try {
       const itemType =
@@ -28,9 +28,9 @@ const Delete: React.FC<DeleteProps> = ({ item, id }) => {
           ? "user"
           : "application";
           if(itemType==="application"){
-            await deleteApplication(id);
+            await deleteApplication(id,token);
           } else {
-            await deleteUser(id);
+            await deleteUser(id,token);
           }
        
         window.location.reload();

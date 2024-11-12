@@ -1,10 +1,8 @@
-import { Separator } from "@/components/ui/separator";
 import { useUserStore } from "@/store/useUserStore";
 import { Link } from "react-router-dom";
-import SideBar from "@/components/SideBar";
 import Applications from "./Applications";
 import Users from "./Users";
-// const Dashboard = ({ children }: { children: React.ReactNode }) => {
+
 const Dashboard = () => {
 
     const {user,isAuthenticated, role}=useUserStore()
@@ -14,8 +12,8 @@ const Dashboard = () => {
     {isAuthenticated?(
         <>
         <section className='heading'>
-        <h2 >Welcome to youX <span className="font-bold">{role}</span> Dashboard</h2> 
-    {role.toLowerCase()==="admin"?(
+        <h2 >Welcome to youX <span className="font-bold">{user!}'s {role}</span> Dashboard</h2> 
+        {role.toLowerCase()==="admin"?(
         <>
         <Users />
         <Applications />
@@ -23,13 +21,10 @@ const Dashboard = () => {
         ):(
         <>
         <Applications />
+        </>  
+        )}
+        </section>
         </>
-        
-    )}
-     
-    </section>
-  
-    </>
     ):(
         <>
         <p className="mt-2">
@@ -39,10 +34,9 @@ const Dashboard = () => {
             <Link to="/signup" className="text-blue-500"> Signup</Link>
         </p>
         </>
-    )}
-    
-    </>
-  )
+        )}
+        </>
+    )
 }
 
 export default Dashboard

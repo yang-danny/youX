@@ -10,13 +10,13 @@ import {
     TableHeader,
     TableRow,
   } from "@/components/ui/table"
-  import { Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Delete from "../Delete";
 
 const UsersList = () => {
-    const {users,getUsers}=useUserStore()
+    const {users,getUsers, token}=useUserStore()
     useEffect(() => {
-        getUsers()
+        getUsers(token)
     }, [])
 
     const arr = Array.from(Object.entries(users), ([key, value]) => value);
@@ -38,13 +38,13 @@ const UsersList = () => {
       {arr.map((user,index) => (
         <TableRow key={index}>
           <TableCell className="font-medium">
-           <Link className="hover:text-blue-600" to={`/user/${user._id}`} >{user._id}</Link> 
+           <Link className="hover:text-blue-600" to={`/user/${user.id}`} >{user._id}</Link> 
             </TableCell>
           <TableCell>{user.name}</TableCell>
           <TableCell>{user.email}</TableCell>
           <TableCell>{user.phone}</TableCell>
           <TableCell >{user.role}</TableCell>
-          <TableCell ><Delete item="user" id={user._id} />
+          <TableCell ><Delete item="user" id={user.id} />
           </TableCell>
         </TableRow>
       ))}
